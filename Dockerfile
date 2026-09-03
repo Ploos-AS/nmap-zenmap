@@ -5,12 +5,13 @@ FROM alpine:${ALPINE_VERSION} AS nmap-builder
 ARG NMAP_VERSION=7.991
 RUN apk add --no-cache \
         build-base ca-certificates curl linux-headers libpcap-dev libssh2-dev \
-        lua5.4-dev openssl-dev pcre2-dev zlib-dev \
+        openssl-dev pcre2-dev zlib-dev \
     && curl --fail --location --proto '=https' --tlsv1.2 \
         "https://nmap.org/dist/nmap-${NMAP_VERSION}.tar.bz2" -o /tmp/nmap.tar.bz2 \
     && tar -xjf /tmp/nmap.tar.bz2 -C /tmp \
     && cd "/tmp/nmap-${NMAP_VERSION}" \
-    && ./configure --prefix=/usr/local --without-zenmap --without-ndiff \
+    && ./configure --prefix=/usr/local --with-liblua=included \
+        --without-zenmap --without-ndiff \
     && make -j"$(getconf _NPROCESSORS_ONLN)" \
     && make install DESTDIR=/out \
     && strip /out/usr/local/bin/nmap /out/usr/local/bin/ncat /out/usr/local/bin/nping
@@ -28,7 +29,7 @@ LABEL org.opencontainers.image.title="Nmap + Zenmap Web" \
 
 RUN apk add --no-cache \
         adwaita-icon-theme ca-certificates curl dbus dbus-x11 font-dejavu gtk+3.0 \
-        libcap libpcap libssh2 lua5.4 openbox openssl pcre2 py3-gobject3 py3-pip \
+        libcap libpcap libssh2 openbox openssl pcre2 py3-gobject3 py3-pip \
         novnc python3 shared-mime-info su-exec websockify x11vnc xvfb zlib \
     && addgroup -g 1000 zenmap \
     && adduser -D -u 1000 -G zenmap -h /config zenmap \
