@@ -1,0 +1,20 @@
+[Unit]
+Description=Nmap and Zenmap browser container
+After=network-online.target
+Wants=network-online.target
+
+[Container]
+Image=ghcr.io/pgousdal/nmap-zenmap:latest
+ContainerName=zenmap
+Network=host
+AddCapability=NET_RAW NET_ADMIN
+EnvironmentFile=%h/.config/nmap-zenmap/nmap-zenmap.env
+Volume=%h/.local/share/nmap-zenmap:/config:Z
+
+[Service]
+Restart=on-failure
+TimeoutStartSec=900
+
+[Install]
+WantedBy=default.target
+

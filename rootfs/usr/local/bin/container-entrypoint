@@ -1,0 +1,47 @@
+#!/bin/sh
+set -eu
+
+if [ "$#" -gt 0 ]; then
+  exec "$@"
+fi
+
+case "${WEB_PORT}:${VNC_PORT}:${GEOMETRY}:${DEPTH}:${PUID}:${PGID}" in
+  *[!0-9:x]*) echo "Invalid numeric/display configuration" >&2; exit 64 ;;
+esac
+
+if [ "$(id -u)" -eq 0 ]; then
+  if [ "${PGID}" != "1000" ]; then delgroup zenmap 2>/dev/null || true; addgroup -g "${PGID}" zenmap; fi
+  if [ "${PUID}" != "1000" ]; then deluser zenmap 2>/dev/null || true; adduser -D -u "${PUID}" -G zenmap -h /config zenmap; fi
+  mkdir -p /config/scans /config/.vnc /tmp/runtime-zenmap
+  chown -R "${PUID}:${PGID}" /config /tmp/runtime-zenmap
+  chmod 700 /tmp/runtime-zenmap
+fi
+
+export HOME=/config XDG_CONFIG_HOME=/config/.config XDG_DATA_HOME=/config/.local/share
+export XDG_RUNTIME_DIR=/tmp/runtime-zenmap
+
+if [ -n "${VNC_PASSWORD:-}" ]; then
+  x11vnc -storepasswd "${VNC_PASSWORD}" /config/.vnc/passwd >/dev/null
+  VNC_AUTH="-rfbauth /config/.vnc/passwd"
+else
+  echo "WARNING: VNC_PASSWORD is unset; only expose port ${WEB_PORT} to a trusted LAN." >&2
+  VNC_AUTH="-nopw"
+fi
+
+run_user() {
+  if [ "$(id -u)" -eq 0 ]; then su-exec "${PUID}:${PGID}" "$@"; else "$@"; fi
+}
+
+cleanup() { kill $(jobs -p) 2>/dev/null || true; }
+trap cleanup INT TERM EXIT
+
+run_user Xvfb "${DISPLAY}" -screen 0 "${GEOMETRY}x${DEPTH}" -nolisten tcp &
+sleep 1
+run_user dbus-launch --exit-with-session openbox-session &
+# shellcheck disable=SC2086
+run_user x11vnc -display "${DISPLAY}" -forever -shared -rfbport "${VNC_PORT}" ${VNC_AUTH} &
+websockify --web /usr/share/novnc "${WEB_PORT}" "127.0.0.1:${VNC_PORT}" &
+sleep 1
+run_user zenmap &
+
+wait -n
