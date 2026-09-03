@@ -4,7 +4,7 @@ services:
       context: .
       args:
         NMAP_VERSION: "7.991"
-    image: ghcr.io/pgousdal/nmap-zenmap:latest
+    image: ghcr.io/ploos-as/nmap-zenmap:latest
     container_name: zenmap
     network_mode: host
     cap_add:

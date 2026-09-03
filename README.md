@@ -11,8 +11,19 @@ One multi-architecture OCI image is published to GitHub Container Registry and
 works with both Docker and Podman:
 
 ```text
-ghcr.io/pgousdal/nmap-zenmap:latest
+ghcr.io/ploos-as/nmap-zenmap:latest
 ```
+
+## Repositories
+
+- Primary: `http://localhost:3000/Ploos-AS/nmap-zenmap`
+- Public mirror: `https://github.com/Ploos-AS/nmap-zenmap`
+- Container: `ghcr.io/ploos-as/nmap-zenmap`
+
+Development, issues, pull requests, releases, and tags originate in Forgejo.
+Forgejo push-mirrors Git refs to GitHub. The mirrored GitHub refs trigger the
+container workflow and publish the image to GHCR. See
+[`docs/FORGEJO_GITHUB_MIRROR.md`](docs/FORGEJO_GITHUB_MIRROR.md).
 
 ## Start it
 

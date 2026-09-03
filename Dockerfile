@@ -21,8 +21,8 @@ ARG ZENMAP_WHEEL_SHA256=""
 
 LABEL org.opencontainers.image.title="Nmap + Zenmap Web" \
       org.opencontainers.image.description="Official Nmap and Zenmap exposed through a browser" \
-      org.opencontainers.image.source="https://github.com/pgousdal/nmap-zenmap" \
-      org.opencontainers.image.documentation="https://github.com/pgousdal/nmap-zenmap#readme" \
+      org.opencontainers.image.source="https://github.com/Ploos-AS/nmap-zenmap" \
+      org.opencontainers.image.documentation="https://github.com/Ploos-AS/nmap-zenmap#readme" \
       org.opencontainers.image.vendor="Per Gustav Ousdal" \
       org.opencontainers.image.licenses="NPSL"
 

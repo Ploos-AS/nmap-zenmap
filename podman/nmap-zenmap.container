@@ -4,7 +4,7 @@ After=network-online.target
 Wants=network-online.target
 
 [Container]
-Image=ghcr.io/pgousdal/nmap-zenmap:latest
+Image=ghcr.io/ploos-as/nmap-zenmap:latest
 ContainerName=zenmap
 Network=host
 AddCapability=NET_RAW NET_ADMIN
@@ -17,4 +17,3 @@ TimeoutStartSec=900
 
 [Install]
 WantedBy=default.target
-
