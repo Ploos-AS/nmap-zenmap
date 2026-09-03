@@ -34,12 +34,14 @@ RUN apk add --no-cache \
     && adduser -D -u 1000 -G zenmap -h /config zenmap \
     && mkdir -p /config/scans /run/dbus \
     && curl --fail --location --proto '=https' --tlsv1.2 \
-        "https://nmap.org/dist/zenmap-${NMAP_VERSION}-py3-none-any.whl" -o /tmp/zenmap.whl \
+        "https://nmap.org/dist/zenmap-${NMAP_VERSION}-py3-none-any.whl" \
+        -o "/tmp/zenmap-${NMAP_VERSION}-py3-none-any.whl" \
     && if [ -n "$ZENMAP_WHEEL_SHA256" ]; then \
-         echo "$ZENMAP_WHEEL_SHA256  /tmp/zenmap.whl" | sha256sum -c -; \
+         echo "$ZENMAP_WHEEL_SHA256  /tmp/zenmap-${NMAP_VERSION}-py3-none-any.whl" | sha256sum -c -; \
        fi \
-    && pip3 install --break-system-packages --no-cache-dir --no-deps /tmp/zenmap.whl \
-    && rm -f /tmp/zenmap.whl \
+    && pip3 install --break-system-packages --no-cache-dir --no-deps \
+        "/tmp/zenmap-${NMAP_VERSION}-py3-none-any.whl" \
+    && rm -f "/tmp/zenmap-${NMAP_VERSION}-py3-none-any.whl" \
     && ln -sf vnc.html /usr/share/novnc/index.html
 
 COPY --from=nmap-builder /out/ /
