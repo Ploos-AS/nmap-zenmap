@@ -50,7 +50,7 @@ COPY rootfs/ /
 RUN setcap cap_net_raw,cap_net_admin+eip /usr/local/bin/nmap \
     && setcap cap_net_raw+eip /usr/local/bin/nping
 
-ENV DISPLAY=:0 \
+ENV DISPLAY=:99 \
     WEB_PORT=6080 \
     VNC_PORT=5900 \
     GEOMETRY=1440x900 \

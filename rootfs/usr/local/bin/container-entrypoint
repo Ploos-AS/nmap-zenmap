@@ -22,6 +22,10 @@ export XDG_RUNTIME_DIR=/tmp/runtime-zenmap
 
 if [ -n "${VNC_PASSWORD:-}" ]; then
   x11vnc -storepasswd "${VNC_PASSWORD}" /config/.vnc/passwd >/dev/null
+  if [ "$(id -u)" -eq 0 ]; then
+    chown "${PUID}:${PGID}" /config/.vnc/passwd
+  fi
+  chmod 600 /config/.vnc/passwd
   VNC_AUTH="-rfbauth /config/.vnc/passwd"
 else
   echo "WARNING: VNC_PASSWORD is unset; only expose port ${WEB_PORT} to a trusted LAN." >&2
