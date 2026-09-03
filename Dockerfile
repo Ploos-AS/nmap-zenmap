@@ -29,8 +29,9 @@ LABEL org.opencontainers.image.title="Nmap + Zenmap Web" \
 
 RUN apk add --no-cache \
         adwaita-icon-theme ca-certificates curl dbus dbus-x11 font-dejavu gtk+3.0 \
-        libcap libpcap libssh2 openbox openssl pcre2 py3-gobject3 py3-pip \
-        novnc python3 shared-mime-info su-exec websockify x11vnc xvfb zlib \
+        libcap libpcap libssh2 openbox openssl pcre2 py3-cairo py3-gobject3 \
+        py3-pip py3-xdg novnc python3 shared-mime-info su-exec websockify \
+        x11vnc xvfb zlib \
     && addgroup -g 1000 zenmap \
     && adduser -D -u 1000 -G zenmap -h /config zenmap \
     && mkdir -p /config/scans /run/dbus \
