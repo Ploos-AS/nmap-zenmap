@@ -43,6 +43,8 @@ RUN apk add --no-cache \
        fi \
     && pip3 install --break-system-packages --no-cache-dir --no-deps \
         "/tmp/zenmap-${NMAP_VERSION}-py3-none-any.whl" \
+    && sed -i "s/(lvl,)]/(min(lvl, 5),)]/" \
+        /usr/lib/python3.*/site-packages/zenmapGUI/Icons.py \
     && rm -f "/tmp/zenmap-${NMAP_VERSION}-py3-none-any.whl" \
     && ln -sf vnc.html /usr/share/novnc/index.html
 
