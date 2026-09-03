@@ -23,15 +23,21 @@ export XDG_RUNTIME_DIR=/tmp/runtime-zenmap
 export NMAP_PRIVILEGED="${NMAP_PRIVILEGED:-1}"
 
 if [ -n "${VNC_PASSWORD:-}" ]; then
+  if [ "${#VNC_PASSWORD}" -gt 8 ]; then
+    echo "WARNING: Traditional VNC authentication uses only the first 8 password characters." >&2
+  fi
   x11vnc -storepasswd "${VNC_PASSWORD}" /config/.vnc/passwd >/dev/null
   if [ "$(id -u)" -eq 0 ]; then
     chown "${PUID}:${PGID}" /config/.vnc/passwd
   fi
   chmod 600 /config/.vnc/passwd
   VNC_AUTH="-rfbauth /config/.vnc/passwd"
-else
-  echo "WARNING: VNC_PASSWORD is unset; only expose port ${WEB_PORT} to a trusted LAN." >&2
+elif [ "${ALLOW_INSECURE_VNC:-0}" = "1" ]; then
+  echo "WARNING: VNC authentication is disabled by ALLOW_INSECURE_VNC=1." >&2
   VNC_AUTH="-nopw"
+else
+  echo "VNC_PASSWORD must be set (or explicitly set ALLOW_INSECURE_VNC=1)." >&2
+  exit 64
 fi
 
 run_user() {
@@ -47,7 +53,8 @@ run_user dbus-launch --exit-with-session openbox-session &
 # shellcheck disable=SC2086
 run_user x11vnc -display "${DISPLAY}" -forever -shared -listen 127.0.0.1 \
   -rfbport "${VNC_PORT}" ${VNC_AUTH} &
-websockify --web /usr/share/novnc "${WEB_PORT}" "127.0.0.1:${VNC_PORT}" &
+run_user websockify --web /usr/share/novnc \
+  "${WEB_PORT}" "127.0.0.1:${VNC_PORT}" &
 sleep 1
 
 # Closing Zenmap must not terminate the desktop, VNC server, or container.

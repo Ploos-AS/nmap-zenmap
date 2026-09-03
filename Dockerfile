@@ -25,8 +25,10 @@ LABEL org.opencontainers.image.title="Nmap + Zenmap Web" \
       org.opencontainers.image.source="https://github.com/Ploos-AS/nmap-zenmap" \
       org.opencontainers.image.documentation="https://github.com/Ploos-AS/nmap-zenmap#readme" \
       org.opencontainers.image.vendor="Per Gustav Ousdal" \
-      org.opencontainers.image.licenses="NPSL"
+      org.opencontainers.image.licenses="MIT AND LicenseRef-NPSL"
 
+# Zenmap 7.991 can calculate vulnerability level 6 although its bundled
+# artwork only contains levels 1-5 (upstream issue nmap/nmap#3431).
 RUN apk add --no-cache \
         adwaita-icon-theme ca-certificates curl dbus dbus-x11 font-dejavu gtk+3.0 \
         libcap libpcap libssh2 openbox openssl pcre2 py3-cairo py3-gobject3 \
@@ -43,14 +45,19 @@ RUN apk add --no-cache \
        fi \
     && pip3 install --break-system-packages --no-cache-dir --no-deps \
         "/tmp/zenmap-${NMAP_VERSION}-py3-none-any.whl" \
-    && sed -i "s/(lvl,)]/(min(lvl, 5),)]/" \
-        /usr/lib/python3.*/site-packages/zenmapGUI/Icons.py \
+    && if [ "$NMAP_VERSION" = "7.991" ]; then \
+         sed -i "s/(lvl,)]/(min(lvl, 5),)]/" \
+           /usr/lib/python3.*/site-packages/zenmapGUI/Icons.py; \
+         grep -q "min(lvl, 5)" \
+           /usr/lib/python3.*/site-packages/zenmapGUI/Icons.py; \
+       fi \
     && rm -f "/tmp/zenmap-${NMAP_VERSION}-py3-none-any.whl" \
     && ln -sf vnc.html /usr/share/novnc/index.html
 
 COPY --from=nmap-builder /out/ /
 COPY rootfs/ /
-RUN setcap cap_net_raw,cap_net_admin+eip /usr/local/bin/nmap \
+RUN chmod 0755 /usr/local/bin/container-entrypoint \
+    && setcap cap_net_raw,cap_net_admin+eip /usr/local/bin/nmap \
     && setcap cap_net_raw+eip /usr/local/bin/nping
 
 ENV DISPLAY=:99 \
@@ -59,7 +66,8 @@ ENV DISPLAY=:99 \
     GEOMETRY=1440x900 \
     DEPTH=24 \
     PUID=1000 \
-    PGID=1000
+    PGID=1000 \
+    ALLOW_INSECURE_VNC=0
 
 VOLUME ["/config"]
 EXPOSE 6080

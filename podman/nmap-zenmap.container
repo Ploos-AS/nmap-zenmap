@@ -7,7 +7,8 @@ Wants=network-online.target
 Image=ghcr.io/ploos-as/nmap-zenmap:latest
 ContainerName=zenmap
 Network=host
-AddCapability=NET_RAW NET_ADMIN
+AddCapability=CAP_NET_RAW
+AddCapability=CAP_NET_ADMIN
 EnvironmentFile=%h/.config/nmap-zenmap/nmap-zenmap.env
 Volume=%h/.local/share/nmap-zenmap:/config:Z
 

@@ -61,15 +61,19 @@ prevent accidental divergence.
 
 ## 6. Publish the first image
 
-A mirrored push to `main` publishes `edge`. Create releases in Forgejo:
+A mirrored push to `main` publishes `edge`. Create and push the release tag:
 
 ```sh
-git tag -a v7.991-1 -m "Nmap 7.991 container release 1"
-git push origin v7.991-1
+git tag -a v0.1.0 -m "Nmap + Zenmap Web v0.1.0"
+git push origin v0.1.0
 ```
 
-Forgejo mirrors the tag. GitHub Actions then publishes `latest`, `7.991-1`,
-`7.991`, and `7` to `ghcr.io/ploos-as/nmap-zenmap`.
+Forgejo mirrors the tag. GitHub Actions then publishes `latest`, `0.1.0`, and
+`0.1` to `ghcr.io/ploos-as/nmap-zenmap`, emits an attestation, and creates the
+mirrored GitHub Release.
+
+In Forgejo, create the release from the existing tag and use
+`docs/releases/v0.1.0.md` as the release notes.
 
 After first publication, set the GHCR package visibility to public and connect
 the package to the GitHub repository if GitHub has not linked it automatically.

@@ -1,9 +1,5 @@
 services:
   zenmap:
-    build:
-      context: .
-      args:
-        NMAP_VERSION: "7.991"
     image: ghcr.io/ploos-as/nmap-zenmap:latest
     container_name: zenmap
     network_mode: host
@@ -11,11 +7,11 @@ services:
       - NET_RAW
       - NET_ADMIN
     environment:
-      TZ: Europe/Oslo
-      WEB_PORT: "6080"
+      TZ: ${TZ:-Europe/Oslo}
+      WEB_PORT: ${WEB_PORT:-6080}
       VNC_PASSWORD: ${VNC_PASSWORD:?Set VNC_PASSWORD in .env}
-      PUID: "1000"
-      PGID: "1000"
+      PUID: ${PUID:-1000}
+      PGID: ${PGID:-1000}
     volumes:
       - ./config:/config
     restart: unless-stopped
